@@ -14,12 +14,14 @@ const DeleteTaskModal: FC<DeleteModalProps> = ({
   handleDeleteTask,
   loading,
 }) => {
-  const { handleDeleteTaskModalAction, selectedTasks } = useGlobalContext();
+  const { handleDeleteTaskModalAction, selectedTasks, setSelectedTasks } =
+    useGlobalContext();
   const { bulkDeleteTasks } = useTasks();
 
   const handleBulkDeleteTasks = useCallback(async () => {
     await bulkDeleteTasks(selectedTasks);
     handleDeleteTaskModalAction();
+    setSelectedTasks([]);
   }, [selectedTasks, bulkDeleteTasks, handleDeleteTaskModalAction]);
 
   return (

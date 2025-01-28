@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import { useGlobalContext } from '../../context/GlobalContext';
 import useTasks from '../hooks/useTasks';
 import { cn } from '../../utils/utils';
+import { TaskStatus } from '../../utils/types';
 
 const FloatingActionBar = () => {
   const [status, setStatus] = useState<string>('');
@@ -39,6 +40,10 @@ const FloatingActionBar = () => {
         />
       </div>
       <img
+        onClick={() => {
+          setStatus(TaskStatus.COMPLETED);
+          handleStatusUpdate(TaskStatus.COMPLETED);
+        }}
         className='w-[17px] cursor-pointer'
         src={assets.TickSquareImg}
         alt='tick'
