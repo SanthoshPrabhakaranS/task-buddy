@@ -394,21 +394,19 @@ const useTasks = () => {
   // Sort tasks by due date
   const sortTasksByDueDate = useCallback(
     (state: string) => {
+      const sortedTasks = tasks.map((task) => ({ ...task }));
+
       if (state === SORT_STATE.ASC) {
-        const sortedTasks = tasks.sort((a, b) => {
+        sortedTasks.sort((a, b) => {
           return new Date(a.dueOn).getTime() - new Date(b.dueOn).getTime();
         });
-        console.log(sortedTasks, 'Asc');
-
-        setTasks([...sortedTasks]);
       } else {
-        const sortedTasks = tasks.sort((a, b) => {
+        sortedTasks.sort((a, b) => {
           return new Date(b.dueOn).getTime() - new Date(a.dueOn).getTime();
         });
-        console.log(sortedTasks, 'Desc');
-
-        setTasks([...sortedTasks]);
       }
+
+      setTasks(sortedTasks);
     },
     [tasks, setTasks, SORT_STATE]
   );

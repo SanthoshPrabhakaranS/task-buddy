@@ -1,8 +1,8 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { Task, TaskStatus } from '../../utils/types';
 import TaskCardAction from '../shared/task-card-actions';
 import { useGlobalContext } from '../../context/GlobalContext';
-import { cn, convertDate } from '../../utils/utils';
+import { cn, convertDate, truncate } from '../../utils/utils';
 import { useSortable } from '@dnd-kit/sortable';
 
 interface BoardItemProps {
@@ -28,15 +28,11 @@ const BoardItem: FC<BoardItemProps> = ({ task }) => {
         scale: isDragging ? 1.05 : 1,
         boxShadow: isDragging ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
         backgroundColor: isDragging ? '#F9F9F9' : 'white',
-        borderRadius: isDragging ? '13px' : '0',
+        borderRadius: isDragging ? '13px' : '13px',
         gridTemplateColumns: '2fr 1fr 1fr 1fr',
         zIndex: isDragging ? 1 : 'auto',
       }
     : undefined;
-
-  const truncate = useCallback((str: string, n: number) => {
-    return str.length > n ? str.substr(0, n - 1) + '...' : str;
-  }, []);
 
   return (
     <div

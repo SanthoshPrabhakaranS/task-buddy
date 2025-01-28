@@ -1,50 +1,70 @@
-# React + TypeScript + Vite
+# Task Management Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive task management application built with **React**, **TypeScript**, **Firebase**, and **Context API**. This application allows users to efficiently create, organize, and track their tasks with an intuitive user interface and powerful features.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. **User Authentication**
 
-## Expanding the ESLint configuration
+- Sign in with **Google** using **Firebase Authentication**.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### 2. **Task Management**
 
-- Configure the top-level `parserOptions` property like this:
+- Create, edit, and delete tasks.
+- Categorize tasks (e.g., work, personal) and add tags for better organization.
+- Set due dates for tasks.
+- **Drag-and-drop** functionality to rearrange tasks.
+- Sort tasks by due date (ascending/descending).
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 3. **Batch Actions**
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- Perform batch actions like deleting multiple tasks or marking them as complete.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### 4. **Task History and Activity Log**
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- Track changes made to tasks (creation, edits, deletions).
+- Display an activity log for each task.
+
+### 5. **File Attachments**
+
+- Attach files or documents to tasks.
+- File upload feature in the task creation/editing form.
+- Display attached files in the task detail view.
+
+### 6. **Filter and Search**
+
+- Filter tasks by tags, category, and date range.
+- Search tasks by title.
+
+### 7. **Board/List View**
+
+- Switch between **Kanban-style board view** and **list view** for tasks.
+
+### 8. **Responsive Design**
+
+- Fully responsive design with a **desktop-first approach**.
+- Seamlessly adapts to mobile, tablet, and desktop screens.
+
+## Technologies Used
+
+- **Frontend**: React, TypeScript
+- **State Management**: Context API
+- **Authentication**: Firebase Authentication
+- **Database**: Firebase Firestore (for task storage)
+- **Styling**: CSS Modules or Tailwind
+- **Drag-and-Drop**: `@dnd-kit` library
+
+## How to Run the Project
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
+2. Install the dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the App:
+   ```bash
+   npm run dev
+   ```

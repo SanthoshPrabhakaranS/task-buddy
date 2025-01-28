@@ -28,7 +28,7 @@ const FloatingActionBar = () => {
   }, [selectedTasks]);
 
   return (
-    <div className='absolute w-[340px] sm:w-[370px] bottom-0 left-1/2 -translate-x-1/2 flex flex-row gap-3 items-center bg-black rounded-2xl p-3'>
+    <div className='absolute w-[340px] sm:w-[370px] lg:w-auto bottom-0 left-1/2 -translate-x-1/2 flex flex-row gap-3 items-center bg-black rounded-2xl p-3'>
       <div className='py-1 h-[32px] md:h-[36px] text-[12px] border text-white font-medium flex flex-row items-center rounded-full sm:gap-2 px-3 sm:px-4 whitespace-nowrap'>
         <p>{selectedTasks.length} tasks selected</p>{' '}
         <img
@@ -47,7 +47,7 @@ const FloatingActionBar = () => {
         <StatusAndCategoryInput
           triggerElement={
             <div className='flex flex-col gap-1'>
-              <div className='h-[32px] md:h-[36px] px-5 border-white border bg-[#131212] flex justify-between items-center text-[13px] text-white font-semibold cursor-pointer relative rounded-full'>
+              <div className='h-[32px] md:h-[36px] px-5 border-white border bg-[#131212] flex justify-between items-center text-[13px] truncate text-white font-semibold cursor-pointer relative rounded-full'>
                 <p>Status</p>
               </div>
             </div>
@@ -62,7 +62,7 @@ const FloatingActionBar = () => {
           position='top'
           contentClassName='mb-[3.5rem] bg-black !text-white'
           triggerClassName={cn(
-            'h-[36px] px-5 border-white max-sm:text-[10px] border bg-[#131212] flex justify-between items-center text-[13px] text-white font-semibold cursor-pointer relative rounded-full mt-[-0rem]',
+            'h-[36px] px-5 border-white max-sm:text-[10px] border bg-[#131212] flex justify-between items-center text-[10px] text-white font-semibold cursor-pointer relative rounded-full mt-[-0rem] truncate',
             loading && 'cursor-not-allowed'
           )}
         />

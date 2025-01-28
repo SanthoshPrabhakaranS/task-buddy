@@ -21,25 +21,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const [characterCount, setCharacterCount] = useState(0);
 
-  // Initialize the editor
   const editor = useEditor({
     extensions: [StarterKit, BulletList, OrderedList],
     content: value,
     onUpdate: ({ editor }) => {
-      const currentContent = editor.getText(); // Get plain text content
+      const currentContent = editor.getText();
       const currentLength = currentContent.length;
 
-      // Update character count
       setCharacterCount(currentLength);
 
-      // Enforce character limit
       if (currentLength <= maxCharacters) {
-        onChange(editor.getHTML()); // Call the onChange callback with the updated HTML content
+        onChange(editor.getHTML());
       } else {
-        // Truncate content if it exceeds the limit
         const truncatedContent = currentContent.slice(0, maxCharacters);
         editor.commands.setContent(truncatedContent);
-        setCharacterCount(maxCharacters); // Update character count to the limit
+        setCharacterCount(maxCharacters);
       }
     },
     editorProps: {
