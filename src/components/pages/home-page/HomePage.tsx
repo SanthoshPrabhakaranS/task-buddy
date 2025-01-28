@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import MenuBar from './MenuBar';
 import Navbar from './Navbar';
-import Filters from './filters/index';
+import Filters from '../../filters/index';
 import TaskList from '../../task-list';
 import useTasks from '../../hooks/useTasks';
 import { useGlobalContext } from '../../../context/GlobalContext';
 import CreateEditTaskModal from '../../modals/create-edit-task-modal/index';
 import { FormState } from '../../../utils/types';
 import { DeleteTaskModal } from '../../modals/delete-task-modal';
+import TaskBoard from '../../task-borad';
+import FloatingActionBar from '../../floating-action-bar/FloatingActionBar';
 
 const HomePage = () => {
   const [activeMenu, setActiveMenu] = useState<string>('List');
@@ -29,6 +31,7 @@ const HomePage = () => {
     setTaskTitle,
     taskId,
     formState,
+    selectedTasks,
     openCreateEditModal,
     openDeleteTaskModal,
     handleDeleteTaskModalAction,
@@ -61,7 +64,15 @@ const HomePage = () => {
         />
       );
     } else {
-      return <div>Board</div>;
+      return (
+        <TaskBoard
+          tasks={tasks}
+          createTask={createTask}
+          fetchTasks={fetchTasks}
+          setTasks={setTasks}
+          handleModalAction={handleModalAction}
+        />
+      );
     }
   }, [
     activeMenu,
@@ -93,8 +104,8 @@ const HomePage = () => {
   }, [taskId, deleteTask, fetchTasks, handleDeleteTaskModalAction]);
 
   return (
-    <div className='w-full h-full flex flex-col'>
-      <div className='p-[2rem] flex flex-col gap-5'>
+    <div className='w-full h-full flex flex-col relative'>
+      <div className='flex flex-col'>
         {openCreateEditModal && (
           <CreateEditTaskModal
             tasks={tasks}
@@ -129,10 +140,13 @@ const HomePage = () => {
         )}
 
         <Navbar />
-        <MenuBar activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-        <Filters />
+        <div className='px-[1rem] md:px-[2rem] pb-2 sm:pb-[2rem] max-lg:pt-[2rem] flex flex-col gap-5'>
+          <MenuBar activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+          <Filters />
+        </div>
       </div>
       {_renderView}
+      {selectedTasks.length > 0 && <FloatingActionBar />}
     </div>
   );
 };

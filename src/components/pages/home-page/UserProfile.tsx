@@ -3,9 +3,11 @@ import { assets } from '../../../assets';
 import useGetUser from '../../hooks/useGetUser';
 import Popover from '../../shared/popover';
 import { auth } from '../../../firebase/firebase';
+import useWindowWidth from '../../hooks/useWindowWidth';
 
 const UserProfile = () => {
   const { user } = useGetUser();
+  const windowWidth = useWindowWidth();
 
   const handleLogout = useCallback(() => {
     auth.signOut().then(() => {
@@ -14,13 +16,14 @@ const UserProfile = () => {
   }, [auth]);
 
   return (
-    <div className='cursor-pointer'>
+    <div className='cursor-pointer w-full flex justify-end'>
       <Popover
+        position={windowWidth << 1100 ? 'left' : 'bottom'}
         trigger={
-          <div className='flex flex-row justify-center items-center gap-2'>
+          <div className='lg:flex flex-row justify-center items-center gap-2'>
             {user?.photoURL ? (
               <img
-                className='w-10 h-10 rounded-full'
+                className='w-8 h-8 lg:w-10 lg:h-10 rounded-full'
                 src={user?.photoURL}
                 alt='profile-img'
               />
@@ -28,7 +31,7 @@ const UserProfile = () => {
               <div className='w-10 h-10 rounded-full bg-gray-400'></div>
             )}
             {user?.displayName ? (
-              <p className='whitespace-nowrap font-semibold text-black/60'>
+              <p className='whitespace-nowrap font-semibold text-black/60 hidden lg:flex'>
                 {user?.displayName}
               </p>
             ) : (

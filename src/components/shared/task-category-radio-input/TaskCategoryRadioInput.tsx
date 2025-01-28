@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import Button from '../button';
-import { CATEGORIES, TASK_STATUS } from '../../../utils/constants';
+import { CATEGORIES } from '../../../utils/constants';
 import { cn } from '../../../utils/utils';
 
 interface TaskCategoryRadioInputProps {

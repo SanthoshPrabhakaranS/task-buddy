@@ -8,7 +8,7 @@ interface SearchInputProps {
 
 const SearchInput: FC<SearchInputProps> = ({ onChange, value }) => {
   return (
-    <div className='border border-black/60 h-[36px] px-2 rounded-full flex flex-row items-center gap-2'>
+    <div className='w-full md:w-auto border border-black/20 md:border-black/60 h-[36px] px-2 rounded-full flex flex-row items-center gap-2'>
       <Search color='#979797' size={20} />
       <input
         value={value}

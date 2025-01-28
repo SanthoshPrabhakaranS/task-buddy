@@ -19,7 +19,10 @@ interface StatusAndCategoryInputProps {
   onChange: (value: string) => void;
   triggerElement?: JSX.Element;
   contentClassName?: string;
+  triggerClassName?: string;
   label?: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  disabled?: boolean;
 }
 
 const StatusAndCategoryInput: FC<StatusAndCategoryInputProps> = ({
@@ -28,7 +31,10 @@ const StatusAndCategoryInput: FC<StatusAndCategoryInputProps> = ({
   onChange,
   triggerElement,
   contentClassName,
+  triggerClassName,
   label,
+  position,
+  disabled,
 }) => {
   return (
     <div className='flex flex-col gap-1'>
@@ -36,14 +42,15 @@ const StatusAndCategoryInput: FC<StatusAndCategoryInputProps> = ({
         <p className='text-[12px] font-semibold text-black/60'>{label}</p>
       )}
       <Popover
+        position={position}
+        dsiabled={disabled}
         trigger={
           <>
             {value ? (
               <p
                 className={cn(
                   'mt-3 font-semibold text-black text-[14px]',
-                  triggerElement &&
-                    'flex justify-center items-center h-[36px] border border-black/10 rounded-lg p-2 w-[190px] bg-lightGray cursor-pointer text-[12px] mt-0'
+                  triggerElement && triggerClassName
                 )}
               >
                 {value}
@@ -67,7 +74,7 @@ const StatusAndCategoryInput: FC<StatusAndCategoryInputProps> = ({
               return (
                 <p
                   className={cn(
-                    'text-[13px] font-semibold tracking-wide cursor-pointer text-black',
+                    'text-[13px] font-semibold tracking-wide cursor-pointer',
                     value === item.title && 'text-primary'
                   )}
                   key={item.id}

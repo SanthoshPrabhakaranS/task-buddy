@@ -4,6 +4,7 @@ import DatePicker from '../../shared/date-input';
 import { FC, useMemo } from 'react';
 import { format } from 'date-fns';
 import { cn } from '../../../utils/utils';
+import useWindowWidth from '../../hooks/useWindowWidth';
 
 interface DateInputProps {
   dueDate: string;
@@ -24,11 +25,22 @@ const DateInput: FC<DateInputProps> = ({
   iconPosition = 'left',
   resetButton,
 }) => {
+  const windowWidth = useWindowWidth();
   const date = useMemo(() => {
     if (dueDate) {
       return format(new Date(dueDate), 'dd/MM/yyyy');
     }
   }, [dueDate]);
+
+  const datePickerPosition = useMemo(() => {
+    if (windowWidth < 425) {
+      return 'right';
+    } else if (windowWidth < 600) {
+      return 'left';
+    } else {
+      return 'bottom';
+    }
+  }, [windowWidth]);
 
   return (
     <div className='flex flex-col gap-1'>
@@ -36,6 +48,7 @@ const DateInput: FC<DateInputProps> = ({
         <p className='text-[12px] text-black/60 font-semibold'>{label}</p>
       )}
       <Popover
+        position={datePickerPosition}
         trigger={
           <div
             className={cn(

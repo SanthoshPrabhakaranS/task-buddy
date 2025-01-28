@@ -1,35 +1,49 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useMemo,
+} from 'react';
 import { FormState, Task } from '../utils/types';
 
-export const GlobalContext = createContext({
-  taskTitle: '',
-  setTaskTitle: (taskTitle: string) => {},
-  dueDate: '',
-  setDueDate: (dueDate: string) => {},
-  status: '',
-  setStatus: (status: string) => {},
-  category: '',
-  setCategory: (category: string) => {},
-  openCreateEditModal: false,
-  setOpenCreateEditModal: (val: boolean) => {},
-  handleModalAction: () => {},
-  description: '',
-  setDescription: (description: string) => {},
-  file: null as File | null,
-  setFile: (file: File | null) => {},
-  taskId: '',
-  setTaskId: (taskId: string) => {},
-  formState: FormState.CREATE,
-  setFormState: (formState: FormState) => {},
-  handleDeleteTaskModalAction: () => {},
-  setOpenDeleteTaskModal: (val: boolean) => {},
-  openDeleteTaskModal: false,
-  tasks: [] as Task[],
-  setTasks: (tasks: Task[]) => {},
-});
+interface GlobalContextType {
+  taskTitle: string;
+  setTaskTitle: (taskTitle: string) => void;
+  dueDate: string;
+  setDueDate: (dueDate: string) => void;
+  status: string;
+  setStatus: (status: string) => void;
+  category: string;
+  setCategory: (category: string) => void;
+  openCreateEditModal: boolean;
+  setOpenCreateEditModal: (val: boolean) => void;
+  handleModalAction: () => void;
+  description: string;
+  setDescription: (description: string) => void;
+  file: File | null;
+  setFile: (file: File | null) => void;
+  taskId: string;
+  setTaskId: (taskId: string) => void;
+  formState: FormState;
+  setFormState: (formState: FormState) => void;
+  handleDeleteTaskModalAction: () => void;
+  setOpenDeleteTaskModal: (val: boolean) => void;
+  openDeleteTaskModal: boolean;
+  tasks: Task[];
+  setTasks: (tasks: Task[]) => void;
+  selectedTasks: string[];
+  setSelectedTasks: (tasks: string[]) => void;
+}
+
+export const GlobalContext = createContext<GlobalContextType | null>(null);
 
 export const useGlobalContext = () => {
-  return useContext(GlobalContext);
+  const context = useContext(GlobalContext);
+  if (!context) {
+    throw new Error('Error using GlobalContext');
+  }
+  return context;
 };
 
 export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
@@ -46,45 +60,62 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [description, setDescription] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [formState, setFormState] = useState<FormState>(FormState.CREATE);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
 
   const handleModalAction = useCallback(() => {
-    setOpenCreateEditModal(!openCreateEditModal);
-  }, [openCreateEditModal, setOpenCreateEditModal]);
+    setOpenCreateEditModal((prev) => !prev);
+  }, []);
 
   const handleDeleteTaskModalAction = useCallback(() => {
-    setOpenDeleteTaskModal(!openDeleteTaskModal);
-  }, [openDeleteTaskModal, setOpenDeleteTaskModal]);
+    setOpenDeleteTaskModal((prev) => !prev);
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      tasks,
+      setTasks,
+      taskTitle,
+      setTaskTitle,
+      dueDate,
+      setDueDate,
+      status,
+      setStatus,
+      category,
+      setCategory,
+      description,
+      setDescription,
+      file,
+      setFile,
+      taskId,
+      setTaskId,
+      formState,
+      setFormState,
+      selectedTasks,
+      setSelectedTasks,
+      openCreateEditModal,
+      setOpenCreateEditModal,
+      handleModalAction,
+      handleDeleteTaskModalAction,
+      openDeleteTaskModal,
+      setOpenDeleteTaskModal,
+    }),
+    [
+      tasks,
+      taskTitle,
+      dueDate,
+      status,
+      category,
+      description,
+      file,
+      taskId,
+      formState,
+      selectedTasks,
+      openCreateEditModal,
+      openDeleteTaskModal,
+    ]
+  );
 
   return (
-    <GlobalContext.Provider
-      value={{
-        tasks,
-        setTasks,
-        taskTitle,
-        setTaskTitle,
-        dueDate,
-        setDueDate,
-        status,
-        setStatus,
-        category,
-        setCategory,
-        description,
-        setDescription,
-        file,
-        setFile,
-        taskId,
-        setTaskId,
-        formState,
-        setFormState,
-        openCreateEditModal,
-        setOpenCreateEditModal,
-        handleModalAction,
-        handleDeleteTaskModalAction,
-        openDeleteTaskModal,
-        setOpenDeleteTaskModal,
-      }}
-    >
-      {children}
-    </GlobalContext.Provider>
+    <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
   );
 };

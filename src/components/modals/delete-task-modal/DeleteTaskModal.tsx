@@ -1,8 +1,9 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { useGlobalContext } from '../../../context/GlobalContext';
 import Button from '../../shared/button';
 import { Modal } from '../../shared/modal';
 import { LoaderCircle } from 'lucide-react';
+import useTasks from '../../hooks/useTasks';
 
 interface DeleteModalProps {
   handleDeleteTask: () => void;
@@ -13,7 +14,14 @@ const DeleteTaskModal: FC<DeleteModalProps> = ({
   handleDeleteTask,
   loading,
 }) => {
-  const { handleDeleteTaskModalAction } = useGlobalContext();
+  const { handleDeleteTaskModalAction, selectedTasks } = useGlobalContext();
+  const { bulkDeleteTasks } = useTasks();
+
+  const handleBulkDeleteTasks = useCallback(async () => {
+    await bulkDeleteTasks(selectedTasks);
+    handleDeleteTaskModalAction();
+  }, [selectedTasks, bulkDeleteTasks, handleDeleteTaskModalAction]);
+
   return (
     <Modal
       title='Delete Task'
@@ -28,7 +36,11 @@ const DeleteTaskModal: FC<DeleteModalProps> = ({
               className='h-[40px] bg-white border border-black/10 text-black hover:bg-transparent'
             />
             <Button
-              onClick={handleDeleteTask}
+              onClick={
+                selectedTasks.length > 0
+                  ? handleBulkDeleteTasks
+                  : handleDeleteTask
+              }
               title={!loading ? 'Delete' : ''}
               className='h-[40px]'
               icon={
@@ -43,7 +55,9 @@ const DeleteTaskModal: FC<DeleteModalProps> = ({
     >
       <div className='flex flex-col gap-5 p-2 w-full max-w-[600px]'>
         <p className='font-semibold'>
-          Are you sure you want to delete this task ?
+          {selectedTasks.length > 0
+            ? 'Are you sure you want to delete the selected tasks ?'
+            : 'Are you sure you want to delete this task ?'}
         </p>
       </div>
     </Modal>

@@ -1,10 +1,7 @@
-import { FC, useCallback, useMemo, useState } from 'react';
-import { cn } from '../../utils/utils';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { FC, useCallback, useState } from 'react';
+import { cn, convertDate } from '../../utils/utils';
 import { assets } from '../../assets';
 import { Task, TaskStatus } from '../../utils/types';
-import { format, isToday } from 'date-fns';
 import TaskCardAction from '../shared/task-card-actions';
 import StatusAndCategoryInput from './task-inputs/StatusAndCategoryInput';
 import { TASK_STATUS } from '../../utils/constants';
@@ -28,6 +25,7 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
   //     },
   //   },
   // });
+  const { selectedTasks, setSelectedTasks } = useGlobalContext();
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: item.id.toString(),
@@ -35,7 +33,7 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const { status } = useGlobalContext();
-  const { editTask, setTasks } = useTasks();
+  const { editTask } = useTasks();
 
   const style = transform
     ? {
@@ -52,19 +50,9 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
         gridTemplateColumns: '2fr 1fr 1fr 1fr',
       };
 
-  const date = useMemo(() => {
-    return isToday(new Date(item.dueOn))
-      ? 'Today'
-      : format(item.dueOn, 'dd MMM, yyyy');
-  }, [item.dueOn]);
-
   const handleStatusChange = useCallback(
     async (status: string) => {
       setLoading(true);
-      // setTasks(
-      //   tasks.map((task) => (task.id === item.id ? { ...task, status } : task))
-      // );
-      console.log(status);
 
       await editTask({
         ...item,
@@ -75,26 +63,39 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
     [item, status, editTask]
   );
 
+  const handleOnSelect = useCallback(() => {
+    if (selectedTasks.includes(item.id)) {
+      setSelectedTasks(selectedTasks.filter((id) => id !== item.id));
+    } else {
+      setSelectedTasks([...selectedTasks, item.id]);
+    }
+  }, [item.id, selectedTasks, setSelectedTasks]);
+
   return (
     <>
       <div
         ref={setNodeRef}
         className={cn(
-          'grid grid-cols-4 gap-4 text-black/60 text-[15px] relative p-3 border-b-black/10 font-medium'
+          'md:grid md:grid-cols-4 w-full flex gap-4 text-black/60 text-[15px] relative p-3 border-b-black/10 font-medium'
         )}
         style={style}
       >
-        <div className='flex flex-row items-center gap-2'>
+        <div className='flex flex-row items-center gap-2 max-md:w-full'>
           <input
+            checked={selectedTasks.includes(item.id)}
+            onChange={handleOnSelect}
             className='
-            w-[16px] h-[16px] border-2 border-black/10 rounded-sm cursor-pointer'
+            min-w-[16px] min-h-[16px] border-2 border-black/10 rounded-sm cursor-pointer accent-primary'
             type='checkbox'
           />
           <img
             ref={setNodeRef}
             {...attributes}
             {...listeners}
-            className={cn('w-[25px] h-[25px]', isDragging && 'cursor-grabbing')}
+            className={cn(
+              'w-[25px] h-[25px] hidden md:block',
+              isDragging && 'cursor-grabbing'
+            )}
             src={assets.DotsImg}
             alt='dots'
           />
@@ -110,15 +111,17 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
 
           <p
             className={cn(
-              'text-black',
+              'text-black truncate w-full max-w-[300px] sm:max-w-[360px] md:max-w-[200px]',
               item.status === TaskStatus.COMPLETED && 'line-through'
             )}
           >
             {item.title}
           </p>
         </div>
-        <p className='text-black pl-2'>{date}</p>
-        <div className='text-black pl-2 -mt-1 flex items-start'>
+        <p className='text-black pl-2 hidden md:block'>
+          {convertDate(item.dueOn)}
+        </p>
+        <div className='text-black pl-2 -mt-1 md:flex items-start hidden'>
           <StatusAndCategoryInput
             triggerElement={
               <button
@@ -137,8 +140,8 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
             contentClassName='mt-1 '
           />
         </div>
-        <div className='text-black pl-2 w-full flex flex-row items-center justify-between pr-2'>
-          {item.category}
+        <div className='text-black pl-2 w-full flex flex-row items-center justify-end md:justify-between pr-2'>
+          <p className='hidden md:block'>{item.category}</p>
           <TaskCardAction
             handleModalAction={handleModalAction}
             taskId={item.id}
