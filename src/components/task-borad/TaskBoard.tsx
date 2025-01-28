@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Task, TaskStatus } from '../../utils/types';
 import ViewContainer from '../view-container';
-import { cn } from '../../utils/utils';
+import { cn, handleDragEnd } from '../../utils/utils';
 import {
   closestCorners,
   DndContext,
@@ -11,7 +11,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import BoardColumn from './BoardColumn';
-import useTasks from '../hooks/useTasks';
+import LoadingContainer from '../loading-container/index';
 
 interface TaskBoardProps {
   tasks: Task[];
@@ -19,11 +19,10 @@ interface TaskBoardProps {
   fetchTasks: () => void;
   setTasks: any;
   handleModalAction: () => void;
+  tasksLoading: boolean;
 }
 
-const TaskBoard: FC<TaskBoardProps> = ({ setTasks, tasks }) => {
-  const { editTask } = useTasks();
-
+const TaskBoard: FC<TaskBoardProps> = ({ setTasks, tasks, tasksLoading }) => {
   const COLUMNS_DATA = [
     {
       id: 1,
@@ -48,47 +47,6 @@ const TaskBoard: FC<TaskBoardProps> = ({ setTasks, tasks }) => {
     },
   ];
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-    // if (over && active.id !== over?.id) {
-    //   setTasks((tasks: any) => {
-    //     const oldIndex = tasks.findIndex((task: any) => task.id === active.id);
-    //     const newIndex = tasks.findIndex((task: any) => task.id === over?.id);
-
-    //     // Reorder the tasks
-    //     const newTasks = [...tasks];
-    //     const [movedTask] = newTasks.splice(oldIndex, 1);
-    //     newTasks.splice(newIndex, 0, movedTask);
-
-    //     return newTasks;
-    //   });
-    // }
-
-    const taskId = active.id as string;
-    const newStatus = over.id as TaskStatus;
-
-    setTasks(() =>
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
-
-    try {
-      const updatedTask = tasks.find((task) => task.id === taskId) as Task;
-
-      if (updatedTask.status === newStatus) return;
-
-      await editTask({
-        ...updatedTask,
-        status: newStatus,
-      });
-    } catch (error) {
-      console.error(error, 'Failed to update task status');
-    }
-  };
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -97,13 +55,17 @@ const TaskBoard: FC<TaskBoardProps> = ({ setTasks, tasks }) => {
     })
   );
 
+  if (tasksLoading) {
+    return <LoadingContainer />;
+  }
+
   return (
     <ViewContainer>
       <div className='h-full flex flex-row gap-5'>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
+          onDragEnd={(e: DragEndEvent) => handleDragEnd(e, setTasks)}
         >
           {COLUMNS_DATA.map((column) => {
             return (

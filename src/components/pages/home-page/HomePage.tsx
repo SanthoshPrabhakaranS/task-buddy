@@ -10,11 +10,20 @@ import { FormState } from '../../../utils/types';
 import { DeleteTaskModal } from '../../modals/delete-task-modal';
 import TaskBoard from '../../task-borad';
 import FloatingActionBar from '../../floating-action-bar/FloatingActionBar';
+import ErrorPage from '../error-page';
 
 const HomePage = () => {
   const [activeMenu, setActiveMenu] = useState<string>('List');
-  const { createTask, fetchTasks, tasks, setTasks, editTask, deleteTask } =
-    useTasks();
+  const {
+    createTask,
+    fetchTasks,
+    tasks,
+    setTasks,
+    editTask,
+    deleteTask,
+    error,
+    loading: tasksLoading,
+  } = useTasks();
   const {
     handleModalAction,
     description,
@@ -51,6 +60,10 @@ const HomePage = () => {
   }, [setTasks, fetchTasks]);
 
   const _renderView = useMemo(() => {
+    if (error) {
+      return <ErrorPage />;
+    }
+
     if (activeMenu === 'List') {
       return (
         <TaskList
@@ -61,6 +74,7 @@ const HomePage = () => {
           handleModalAction={handleModalAction}
           visibleTasks={visibleTasks}
           setVisibleTasks={setVisibleTasks}
+          tasksLoading={tasksLoading}
         />
       );
     } else {
@@ -71,6 +85,7 @@ const HomePage = () => {
           fetchTasks={fetchTasks}
           setTasks={setTasks}
           handleModalAction={handleModalAction}
+          tasksLoading={tasksLoading}
         />
       );
     }
@@ -85,6 +100,8 @@ const HomePage = () => {
     deleteTask,
     visibleTasks,
     setVisibleTasks,
+    error,
+    tasksLoading,
   ]);
 
   const editableData = useMemo(() => {

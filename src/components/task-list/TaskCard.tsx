@@ -7,7 +7,7 @@ import StatusAndCategoryInput from './task-inputs/StatusAndCategoryInput';
 import { TASK_STATUS } from '../../utils/constants';
 import { useGlobalContext } from '../../context/GlobalContext';
 import useTasks from '../hooks/useTasks';
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
 
 interface TaskCardProps {
   item: Task;
@@ -16,20 +16,17 @@ interface TaskCardProps {
 }
 
 const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
-  // const { transition } = useSortable({
-  //   id: item.id.toString(),
-  //   data: {
-  //     type: 'task',
-  //     sortable: {
-  //       containerId: item.status,
-  //     },
-  //   },
-  // });
+  const {
+    transition,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+    attributes,
+  } = useSortable({
+    id: item.id.toString(),
+  });
   const { selectedTasks, setSelectedTasks } = useGlobalContext();
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: item.id.toString(),
-    });
 
   const [loading, setLoading] = useState<boolean>(false);
   const { status } = useGlobalContext();
@@ -37,7 +34,7 @@ const TaskCard: FC<TaskCardProps> = ({ item, tasks, handleModalAction }) => {
 
   const style = transform
     ? {
-        // transition: transition || 'transform 200ms ease, box-shadow 200ms ease',
+        transition: transition || 'transform 200ms ease, box-shadow 200ms ease',
         transform: `translate(${transform.x}px, ${transform.y}px)`,
         scale: isDragging ? 1.05 : 1,
         boxShadow: isDragging ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',

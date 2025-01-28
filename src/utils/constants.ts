@@ -68,3 +68,8 @@ export const MODAL_TOGGLE_BUTTON_VALUES = [
     title: 'Activity',
   },
 ];
+
+export const SORT_STATE = {
+  ASC: 'ASC',
+  DESC: 'DESC',
+};

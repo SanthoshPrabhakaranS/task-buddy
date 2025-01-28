@@ -3,26 +3,34 @@ import { Task, TaskStatus } from '../../utils/types';
 import TaskCardAction from '../shared/task-card-actions';
 import { useGlobalContext } from '../../context/GlobalContext';
 import { cn, convertDate } from '../../utils/utils';
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
 
 interface BoardItemProps {
   task: Task;
 }
 const BoardItem: FC<BoardItemProps> = ({ task }) => {
   const { handleModalAction } = useGlobalContext();
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: task.id.toString(),
-    });
+  const {
+    transition,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+    attributes,
+  } = useSortable({
+    id: task.id.toString(),
+  });
 
   const style = transform
     ? {
+        transition: transition || 'transform 200ms ease, box-shadow 200ms ease',
         transform: `translate(${transform.x}px, ${transform.y}px)`,
         scale: isDragging ? 1.05 : 1,
         boxShadow: isDragging ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
-        backgroundColor: isDragging ? 'white' : 'transparent',
+        backgroundColor: isDragging ? '#F9F9F9' : 'white',
         borderRadius: isDragging ? '13px' : '0',
-        zIndex: isDragging ? 10 : 'auto',
+        gridTemplateColumns: '2fr 1fr 1fr 1fr',
+        zIndex: isDragging ? 1 : 'auto',
       }
     : undefined;
 

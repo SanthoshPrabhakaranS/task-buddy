@@ -23,6 +23,7 @@ import OrderedListImg from './icons/number-list.svg';
 import FileImg from './icons/file.jpg';
 import CloseImgWhite from './icons/close-white.svg';
 import TickSquareImg from './icons/tick-square.svg';
+import SortImg from './icons/sort.svg';
 
 export const assets = {
   Logo,
@@ -50,4 +51,5 @@ export const assets = {
   FileImg,
   CloseImgWhite,
   TickSquareImg,
+  SortImg,
 };

@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useGlobalContext } from '../../context/GlobalContext';
 import { v4 as uuidv4 } from 'uuid';
 import { Storage } from '../storage/storage';
+import { SORT_STATE } from '../../utils/constants';
 
 const useTasks = () => {
   const { tasks, setTasks } = useGlobalContext();
@@ -390,6 +391,28 @@ const useTasks = () => {
     fetchTasks();
   }, []);
 
+  // Sort tasks by due date
+  const sortTasksByDueDate = useCallback(
+    (state: string) => {
+      if (state === SORT_STATE.ASC) {
+        const sortedTasks = tasks.sort((a, b) => {
+          return new Date(a.dueOn).getTime() - new Date(b.dueOn).getTime();
+        });
+        console.log(sortedTasks, 'Asc');
+
+        setTasks([...sortedTasks]);
+      } else {
+        const sortedTasks = tasks.sort((a, b) => {
+          return new Date(b.dueOn).getTime() - new Date(a.dueOn).getTime();
+        });
+        console.log(sortedTasks, 'Desc');
+
+        setTasks([...sortedTasks]);
+      }
+    },
+    [tasks, setTasks, SORT_STATE]
+  );
+
   return {
     tasks,
     loading,
@@ -403,6 +426,7 @@ const useTasks = () => {
     filterBySearch,
     bulkStatusUpdate,
     bulkDeleteTasks,
+    sortTasksByDueDate,
   };
 };
 

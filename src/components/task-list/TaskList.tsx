@@ -1,10 +1,13 @@
-import { TABLE_HEADERS } from '../../utils/constants';
+import { SORT_STATE, TABLE_HEADERS } from '../../utils/constants';
 import ListItem from './ListItem.tsx';
 import { closestCorners, DndContext, DragEndEvent } from '@dnd-kit/core';
 import { Task, TaskStatus } from '../../utils/types.ts';
-import { FC, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import useTasks from '../hooks/useTasks.tsx';
 import ViewContainer from '../view-container/index.ts';
+import { cn, handleDragEnd } from '../../utils/utils.ts';
+import { assets } from '../../assets/index.ts';
+import LoadingContainer from '../loading-container/LoadingContainer.tsx';
 
 interface TaskListProps {
   tasks: Task[];
@@ -14,6 +17,7 @@ interface TaskListProps {
   handleModalAction: () => void;
   visibleTasks: number;
   setVisibleTasks: (value: number) => void;
+  tasksLoading: boolean;
 }
 
 const TaskList: FC<TaskListProps> = ({
@@ -24,53 +28,56 @@ const TaskList: FC<TaskListProps> = ({
   handleModalAction,
   setVisibleTasks,
   visibleTasks,
+  tasksLoading,
 }) => {
-  const { editTask } = useTasks();
+  const TASKLIST_ROWS = [
+    {
+      id: 1,
+      title: 'To-Do',
+      status: TaskStatus.TODO,
+      tasks: tasks.filter((task) => task.status === TaskStatus.TODO),
+      className: 'bg-pink hover:bg-pink',
+      noDataText: 'No tasks in To-Do',
+      chevronColor: '#3E0344',
+    },
+    {
+      id: 2,
+      title: 'In Progress',
+      status: TaskStatus.IN_PROGRESS,
+      tasks: tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS),
+      className: 'bg-blue hover:bg-blue',
+      noDataText: 'No tasks in Progress',
+      chevronColor: '#055167',
+    },
+    {
+      id: 3,
+      title: 'Completed',
+      status: TaskStatus.COMPLETED,
+      tasks: tasks.filter((task) => task.status === TaskStatus.COMPLETED),
+      className: 'bg-green hover:bg-green',
+      noDataText: 'No tasks Completed',
+      chevronColor: '#0D7A0A',
+    },
+  ];
+
+  const { sortTasksByDueDate } = useTasks();
+  const [toggleSort, setToggleSort] = useState<string>(SORT_STATE.ASC);
 
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-    // if (over && active.id !== over?.id) {
-    //   setTasks((tasks: any) => {
-    //     const oldIndex = tasks.findIndex((task: any) => task.id === active.id);
-    //     const newIndex = tasks.findIndex((task: any) => task.id === over?.id);
-
-    //     // Reorder the tasks
-    //     const newTasks = [...tasks];
-    //     const [movedTask] = newTasks.splice(oldIndex, 1);
-    //     newTasks.splice(newIndex, 0, movedTask);
-
-    //     return newTasks;
-    //   });
-    // }
-
-    const taskId = active.id as string;
-    const newStatus = over.id as TaskStatus;
-
-    setTasks(() =>
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
+  const handleSortAction = useCallback(() => {
+    setToggleSort((prev) =>
+      prev === SORT_STATE.ASC ? SORT_STATE.DESC : SORT_STATE.ASC
     );
 
-    try {
-      const updatedTask = tasks.find((task) => task.id === taskId) as Task;
+    sortTasksByDueDate(toggleSort);
+  }, [setToggleSort, toggleSort]);
 
-      if (updatedTask.status === newStatus) return;
-
-      await editTask({
-        ...updatedTask,
-        status: newStatus,
-      });
-    } catch (error) {
-      console.error(error, 'Failed to update task status');
-    }
-  };
+  if (tasksLoading) {
+    return <LoadingContainer />;
+  }
 
   return (
     <ViewContainer>
@@ -84,61 +91,46 @@ const TaskList: FC<TaskListProps> = ({
         }}
       >
         {TABLE_HEADERS.map((header) => (
-          <div className='pl-2' key={header.id}>
-            {header.title}
+          <div
+            className='pl-2 flex flex-row items-center gap-2'
+            key={header.id}
+          >
+            {header.title}{' '}
+            <img
+              src={assets.SortImg}
+              onClick={handleSortAction}
+              className={cn(
+                'w-[11px] cursor-pointer',
+                header.title === 'Due on' ? 'block' : 'hidden'
+              )}
+            />
           </div>
         ))}
       </div>
 
       <div className='w-full flex flex-col gap-4'>
-        {/* To-Do items */}
         <DndContext
           collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
+          onDragEnd={(e: DragEndEvent) => handleDragEnd(e, setTasks)}
         >
-          <ListItem
-            createTask={createTask}
-            tasks={tasks.filter((task) => task.status === TaskStatus.TODO)}
-            title='To-Do'
-            handleDragEnd={handleDragEnd}
-            noDataMessage='No tasks in To-Do'
-            containerHeaderClasses='bg-pink hover:bg-pink'
-            chevronColor='#3E0344'
-            handleModalAction={handleModalAction}
-            status={TaskStatus.TODO}
-            visibleTasks={visibleTasks}
-            setVisibleTasks={setVisibleTasks}
-          />
-
-          {/* In Progress items */}
-          <ListItem
-            tasks={tasks.filter(
-              (task) => task.status === TaskStatus.IN_PROGRESS
-            )}
-            title='In Progress'
-            handleDragEnd={handleDragEnd}
-            noDataMessage='No tasks in Progress'
-            containerHeaderClasses='bg-blue hover:bg-blue'
-            chevronColor='#055167'
-            handleModalAction={handleModalAction}
-            status={TaskStatus.IN_PROGRESS}
-            visibleTasks={visibleTasks}
-            setVisibleTasks={setVisibleTasks}
-          />
-
-          {/* Completed items */}
-          <ListItem
-            tasks={tasks.filter((task) => task.status === TaskStatus.COMPLETED)}
-            title='Completed'
-            handleDragEnd={handleDragEnd}
-            noDataMessage='No tasks Completed'
-            containerHeaderClasses='bg-green hover:bg-green'
-            chevronColor='#0D7A0A'
-            handleModalAction={handleModalAction}
-            status={TaskStatus.COMPLETED}
-            visibleTasks={visibleTasks}
-            setVisibleTasks={setVisibleTasks}
-          />
+          {TASKLIST_ROWS.map((row) => {
+            return (
+              <ListItem
+                key={row.id}
+                createTask={createTask}
+                tasks={row.tasks}
+                title={row.title}
+                handleDragEnd={(e: DragEndEvent) => handleDragEnd(e, setTasks)}
+                noDataMessage={row.noDataText}
+                containerHeaderClasses={row.className}
+                chevronColor={row.chevronColor}
+                handleModalAction={handleModalAction}
+                status={row.status}
+                visibleTasks={visibleTasks}
+                setVisibleTasks={setVisibleTasks}
+              />
+            );
+          })}
         </DndContext>
       </div>
     </ViewContainer>

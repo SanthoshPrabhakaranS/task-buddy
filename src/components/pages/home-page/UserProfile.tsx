@@ -28,14 +28,14 @@ const UserProfile = () => {
                 alt='profile-img'
               />
             ) : (
-              <div className='w-10 h-10 rounded-full bg-gray-400'></div>
+              <div className='w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-400'></div>
             )}
             {user?.displayName ? (
               <p className='whitespace-nowrap font-semibold text-black/60 hidden lg:flex'>
                 {user?.displayName}
               </p>
             ) : (
-              <div className='w-[100px] h-5 bg-gray-400 rounded-md'></div>
+              <div className='w-[100px] h-5 bg-gray-400 rounded-md hidden lg:flex'></div>
             )}
           </div>
         }
