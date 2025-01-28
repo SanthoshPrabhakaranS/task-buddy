@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Activity, Task } from '../../utils/types';
 import { db } from '../../firebase/firebase';
 import {
