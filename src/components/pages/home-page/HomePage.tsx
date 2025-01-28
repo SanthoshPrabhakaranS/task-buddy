@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import MenuBar from './MenuBar';
 import Navbar from './Navbar';
 import Filters from '../../filters/index';
@@ -54,10 +54,6 @@ const HomePage = () => {
     },
     [setActiveMenu]
   );
-
-  useEffect(() => {
-    setTasks([...tasks]);
-  }, [setTasks, fetchTasks]);
 
   const _renderView = useMemo(() => {
     if (error) {

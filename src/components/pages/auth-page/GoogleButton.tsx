@@ -13,7 +13,6 @@ const GoogleButton = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).then(async (result) => {
       if (result.user) {
-        console.log(result.user.uid);
         storage.setItem('userId', JSON.stringify(result.user.uid));
         window.location.href = '/home';
       }

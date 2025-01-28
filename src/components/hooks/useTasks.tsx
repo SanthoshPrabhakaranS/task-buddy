@@ -35,6 +35,8 @@ const useTasks = () => {
 
     try {
       if (!userId) {
+        console.log(userId);
+
         console.log('User is not authenticated');
         setError('User is not authenticated');
       }
@@ -387,13 +389,10 @@ const useTasks = () => {
     [setError, fetchTasks, writeBatch, doc, db]
   );
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
   // Sort tasks by due date
   const sortTasksByDueDate = useCallback(
     (state: string) => {
+      if (tasks.length === 0) return;
       const sortedTasks = tasks.map((task) => ({ ...task }));
 
       if (state === SORT_STATE.ASC) {
