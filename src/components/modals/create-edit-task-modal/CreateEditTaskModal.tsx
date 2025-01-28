@@ -1,15 +1,6 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Modal } from '../../shared/modal/index';
-import RichTextEditor from '../../shared/rich-text-editor/index';
-import DateInput from '../../task-list/task-inputs/DateInput';
-import TaskCategoryRadioInput from '../../shared/task-category-radio-input/index';
-import StatusAndCategoryInput from '../../task-list/task-inputs/StatusAndCategoryInput';
-import {
-  MODAL_TOGGLE_BUTTON_VALUES,
-  TASK_STATUS,
-} from '../../../utils/constants';
-import { assets } from '../../../assets';
-import FileInput from '../../shared/file-input/index';
+import { MODAL_TOGGLE_BUTTON_VALUES } from '../../../utils/constants';
 import Button from '../../shared/button';
 import { FormState, Task } from '../../../utils/types';
 import { LoaderCircle } from 'lucide-react';

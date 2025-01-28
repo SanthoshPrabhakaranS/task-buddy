@@ -3,12 +3,7 @@ import { Task, TaskStatus } from '../../utils/types';
 import TaskCardAction from '../shared/task-card-actions';
 import { useGlobalContext } from '../../context/GlobalContext';
 import { cn, convertDate } from '../../utils/utils';
-import {
-  PointerSensor,
-  useDraggable,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import { useDraggable } from '@dnd-kit/core';
 
 interface BoardItemProps {
   task: Task;
