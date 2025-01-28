@@ -21,7 +21,7 @@ import { SORT_STATE } from '../../utils/constants';
 
 const useTasks = () => {
   const { tasks, setTasks } = useGlobalContext();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const userId = new Storage().getItem('userId');
 
@@ -35,8 +35,6 @@ const useTasks = () => {
 
     try {
       if (!userId) {
-        console.log(userId);
-
         console.log('User is not authenticated');
         setError('User is not authenticated');
       }
@@ -137,10 +135,10 @@ const useTasks = () => {
   //Edit Task
   const editTask = useCallback(
     async (task: Task) => {
+      setLoading(true);
       try {
         let fileURL = null;
         let activityUpdates: Activity[] = [];
-        console.log(tasks);
 
         const unUpdatedTask = tasks.find((temp) => temp.id == task.id);
 
@@ -207,17 +205,19 @@ const useTasks = () => {
           activity: [...(unUpdatedTask?.activity || []), ...activityUpdates],
         });
 
-        setError(null);
         await fetchTasks();
         toast.success('Task updated successfully!');
       } catch (error) {
         console.log('Error', error);
         setError('Failed to edit task');
+      } finally {
+        setLoading(false);
       }
     },
     [
       fetchTasks,
       setError,
+      setLoading,
       uploadAttachmentInCloud,
       userId,
       tasks,
@@ -391,10 +391,14 @@ const useTasks = () => {
 
   // Sort tasks by due date
   const sortTasksByDueDate = useCallback(
-    (state: string) => {
-      if (tasks.length === 0) return;
-      const sortedTasks = tasks.map((task) => ({ ...task }));
+    async (state: string) => {
+      if (tasks.length === 0) {
+        await fetchTasks();
+        return;
+      }
 
+      await fetchTasks();
+      const sortedTasks = tasks.map((task) => ({ ...task }));
       if (state === SORT_STATE.ASC) {
         sortedTasks.sort((a, b) => {
           return new Date(a.dueOn).getTime() - new Date(b.dueOn).getTime();
@@ -404,10 +408,9 @@ const useTasks = () => {
           return new Date(b.dueOn).getTime() - new Date(a.dueOn).getTime();
         });
       }
-
       setTasks(sortedTasks);
     },
-    [tasks, setTasks, SORT_STATE]
+    [tasks, setTasks, SORT_STATE, fetchTasks]
   );
 
   return {

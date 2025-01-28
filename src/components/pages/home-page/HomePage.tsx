@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import MenuBar from './MenuBar';
 import Navbar from './Navbar';
 import Filters from '../../filters/index';
@@ -98,7 +98,12 @@ const HomePage = () => {
     setVisibleTasks,
     error,
     tasksLoading,
+    loading,
   ]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const editableData = useMemo(() => {
     if (taskId && formState === FormState.EDIT) {
