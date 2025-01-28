@@ -2,18 +2,18 @@ import useWindowWidth from '../../hooks/useWindowWidth';
 import { cn } from '../../../utils/utils';
 import { assets } from '../../../assets';
 import GoogleButton from './GoogleButton';
-import useGetUser from '../../hooks/useGetUser';
+import { Storage } from '../../storage/storage';
 import { useEffect } from 'react';
 
 const AuthPage = () => {
   const windowWidth = useWindowWidth();
-  const { user } = useGetUser();
+  const storage = new Storage();
 
   useEffect(() => {
-    if (user) {
+    if (storage.getItem('userId')) {
       window.location.href = '/home';
     }
-  }, [user]);
+  }, [storage]);
 
   return (
     <div className='w-full h-screen flex items-center relative overflow-hidden'>

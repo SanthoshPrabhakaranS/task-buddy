@@ -2,16 +2,23 @@ import { useCallback } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../../firebase/firebase';
 import { assets } from '../../../assets';
+import useTasks from '../../hooks/useTasks';
+import { Storage } from '../../storage/storage';
 
 const GoogleButton = () => {
-  const googleSignIn = useCallback(() => {
+  const { fetchTasks } = useTasks();
+  const storage = new Storage();
+
+  const googleSignIn = useCallback(async () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).then(async (result) => {
       if (result.user) {
+        console.log(result.user.uid);
+        storage.setItem('userId', JSON.stringify(result.user.uid));
         window.location.href = '/home';
       }
     });
-  }, [auth]);
+  }, [auth, fetchTasks]);
 
   return (
     <div

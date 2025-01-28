@@ -4,16 +4,19 @@ import useGetUser from '../../hooks/useGetUser';
 import Popover from '../../shared/popover';
 import { auth } from '../../../firebase/firebase';
 import useWindowWidth from '../../hooks/useWindowWidth';
+import { Storage } from '../../storage/storage';
 
 const UserProfile = () => {
   const { user } = useGetUser();
+  const storage = new Storage();
   const windowWidth = useWindowWidth();
 
   const handleLogout = useCallback(() => {
     auth.signOut().then(() => {
       window.location.href = '/';
+      storage.removeItem('userId');
     });
-  }, [auth]);
+  }, [auth, storage]);
 
   return (
     <div className='cursor-pointer w-full flex justify-end'>
@@ -42,7 +45,7 @@ const UserProfile = () => {
         content={
           <div
             onClick={handleLogout}
-            className='flex flex-row gap-2 items-center'
+            className='flex flex-row gap-2 items-center rounded-2xl p-4'
           >
             <img
               className='w-[14px] h-[14px]'
@@ -52,7 +55,7 @@ const UserProfile = () => {
             <p className='text-[13px] font-semibold'>Logout</p>
           </div>
         }
-        className='w-[150px] rounded-[20px] bg-[#FFF9F9] border-primary/20'
+        className='w-[150px] rounded-[20px] bg-[#FFF9F9] border-primary/20 p-0'
       />
     </div>
   );
