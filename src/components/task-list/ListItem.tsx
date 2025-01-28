@@ -26,7 +26,6 @@ interface ListItemProps {
 }
 
 const ListItem: FC<ListItemProps> = ({
-  handleDragEnd,
   tasks,
   title,
   noDataMessage,

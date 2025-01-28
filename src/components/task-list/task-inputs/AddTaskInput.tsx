@@ -8,6 +8,8 @@ import { useGlobalContext } from '../../../context/GlobalContext';
 import useTasks from '../../hooks/useTasks';
 import { Task } from '../../../utils/types';
 import useGetUser from '../../hooks/useGetUser';
+import { cn } from '../../../utils/utils';
+import { toast } from 'sonner';
 
 interface AddTaskInputProps {
   createTask?: (task: Task) => Promise<string | undefined>;
@@ -40,6 +42,10 @@ const AddTaskInput: FC<AddTaskInputProps> = ({ createTask }) => {
 
   const handleCreateTask = useCallback(
     async (task: Task) => {
+      if (!task.title || !task.dueOn || !task.status || !task.category) {
+        toast.error('Please fill all fields');
+        return;
+      }
       setLoading(true);
       if (createTask) {
         await createTask({
@@ -70,7 +76,7 @@ const AddTaskInput: FC<AddTaskInputProps> = ({ createTask }) => {
   }, [setCategory, setDueDate, setStatus, setTaskTitle, handleOpen]);
 
   return (
-    <div className='w-full border-b border-b-black/10 '>
+    <div className='hidden md:block w-full border-b border-b-black/10 '>
       <div
         onClick={handleOpen}
         className='flex flex-row items-center gap-1 pl-8 pb-3 cursor-pointer'
@@ -120,7 +126,7 @@ const AddTaskInput: FC<AddTaskInputProps> = ({ createTask }) => {
               }
               title='Add'
               icon={<CornerDownLeft size={15} />}
-              className='py-2 px-5'
+              className={cn('py-2 px-5', loading && 'cursor-not-allowed')}
             />
             <Button
               onClick={onHandleCancel}

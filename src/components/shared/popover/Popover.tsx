@@ -6,6 +6,7 @@ interface PopoverProps {
   content: React.ReactNode;
   className?: string;
   position?: 'top' | 'bottom' | 'left' | 'right';
+  dsiabled?: boolean;
 }
 
 const Popover: FC<PopoverProps> = ({
@@ -13,6 +14,7 @@ const Popover: FC<PopoverProps> = ({
   content,
   className,
   position = 'bottom',
+  dsiabled,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -43,7 +45,10 @@ const Popover: FC<PopoverProps> = ({
       <div
         className='relative'
         ref={triggerRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (dsiabled) return;
+          setIsOpen(!isOpen);
+        }}
       >
         {trigger}
       </div>

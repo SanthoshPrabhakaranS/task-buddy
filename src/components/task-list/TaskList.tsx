@@ -4,6 +4,7 @@ import { closestCorners, DndContext, DragEndEvent } from '@dnd-kit/core';
 import { Task, TaskStatus } from '../../utils/types.ts';
 import { FC, useEffect } from 'react';
 import useTasks from '../hooks/useTasks.tsx';
+import ViewContainer from '../view-container/index.ts';
 
 interface TaskListProps {
   tasks: Task[];
@@ -60,6 +61,8 @@ const TaskList: FC<TaskListProps> = ({
     try {
       const updatedTask = tasks.find((task) => task.id === taskId) as Task;
 
+      if (updatedTask.status === newStatus) return;
+
       await editTask({
         ...updatedTask,
         status: newStatus,
@@ -70,12 +73,12 @@ const TaskList: FC<TaskListProps> = ({
   };
 
   return (
-    <div className='w-full h-[75vh] overflow-y-auto no-scrollbar px-[2rem]'>
-      <div className='w-full border-b mb-2'></div>
+    <ViewContainer>
+      <div className='w-full border-b mb-2 hidden lg:block'></div>
 
       {/* Main Table Header */}
       <div
-        className='grid grid-cols-4 gap-4 text-left text-[15px] font-semibold text-black/60'
+        className='hidden lg:grid grid-cols-4 gap-4 text-left text-[15px] font-semibold text-black/60'
         style={{
           gridTemplateColumns: '2fr 1fr 1fr 1fr',
         }}
@@ -128,7 +131,7 @@ const TaskList: FC<TaskListProps> = ({
             tasks={tasks.filter((task) => task.status === TaskStatus.COMPLETED)}
             title='Completed'
             handleDragEnd={handleDragEnd}
-            noDataMessage='No tasks in Completed'
+            noDataMessage='No tasks Completed'
             containerHeaderClasses='bg-green hover:bg-green'
             chevronColor='#0D7A0A'
             handleModalAction={handleModalAction}
@@ -138,7 +141,7 @@ const TaskList: FC<TaskListProps> = ({
           />
         </DndContext>
       </div>
-    </div>
+    </ViewContainer>
   );
 };
 

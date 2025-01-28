@@ -21,7 +21,7 @@ const Modal: FC<ModalProps> = ({
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
       {/* Modal Container */}
-      <div className='bg-white rounded-3xl w-auto mx-auto shadow-lg'>
+      <div className='bg-white rounded-3xl w-full max-w-[800px] xl:max-w-[1000px] lg:w-auto mx-auto shadow-lg'>
         {/* Modal Header */}
         <div className='flex justify-between items-center p-4 border-b border-gray-200'>
           <h3 className='text-[24px] font-medium'>{title}</h3>
@@ -34,7 +34,7 @@ const Modal: FC<ModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className='p-4'>{children}</div>
+        <div className='px-1 py-4 md:p-4'>{children}</div>
 
         {/* Modal Footer */}
         {footer && (

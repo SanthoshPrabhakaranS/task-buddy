@@ -9,11 +9,13 @@ import { FormState } from '../../../utils/types';
 interface TaskCardActionProps {
   handleModalAction?: () => void;
   taskId: string;
+  className?: string;
 }
 
 const TaskCardAction: FC<TaskCardActionProps> = ({
   handleModalAction,
   taskId,
+  className,
 }) => {
   const { setTaskId, setFormState, handleDeleteTaskModalAction } =
     useGlobalContext();
@@ -50,7 +52,7 @@ const TaskCardAction: FC<TaskCardActionProps> = ({
       position='left'
       trigger={
         <img
-          className='w-[20px] cursor-pointer'
+          className={cn('w-[20px] cursor-pointer', className)}
           src={assets.ThreeDotsImg}
           alt='assign'
         />

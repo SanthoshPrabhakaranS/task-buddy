@@ -21,6 +21,8 @@ import StrikeImg from './icons/strike-through.svg';
 import BulletListImg from './icons/bullet-points.svg';
 import OrderedListImg from './icons/number-list.svg';
 import FileImg from './icons/file.jpg';
+import CloseImgWhite from './icons/close-white.svg';
+import TickSquareImg from './icons/tick-square.svg';
 
 export const assets = {
   Logo,
@@ -46,4 +48,6 @@ export const assets = {
   BulletListImg,
   OrderedListImg,
   FileImg,
+  CloseImgWhite,
+  TickSquareImg,
 };

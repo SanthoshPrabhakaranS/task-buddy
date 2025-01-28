@@ -26,6 +26,8 @@ export const GlobalContext = createContext({
   openDeleteTaskModal: false,
   tasks: [] as Task[],
   setTasks: (tasks: Task[]) => {},
+  selectedTasks: [] as string[],
+  setSelectedTasks: (tasks: string[]) => {},
 });
 
 export const useGlobalContext = () => {
@@ -46,6 +48,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [description, setDescription] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [formState, setFormState] = useState<FormState>(FormState.CREATE);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
 
   const handleModalAction = useCallback(() => {
     setOpenCreateEditModal(!openCreateEditModal);
@@ -75,6 +78,8 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         taskId,
         setTaskId,
         formState,
+        selectedTasks,
+        setSelectedTasks,
         setFormState,
         openCreateEditModal,
         setOpenCreateEditModal,

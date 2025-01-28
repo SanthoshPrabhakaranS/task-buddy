@@ -8,11 +8,11 @@ interface ActivitySectionProps {
 
 const ActivitySection: FC<ActivitySectionProps> = ({ activities }) => {
   return (
-    <div className='w-full flex col-span-1 max-w-[350px] flex-col bg-lightGray border-l mt-[-0.7rem]'>
-      <div className='h-[43px] px-2 flex justify-start items-start bg-white'>
+    <div className='w-full flex col-span-2 lg:col-span-1 lg:max-w-[350px] flex-col md:bg-lightGray lg:border-l mt-[-0.7rem]'>
+      <div className='h-[43px] px-2 hidden lg:flex justify-start items-start bg-white'>
         <h1 className='font-medium mt-2 text-black/60'>Activity</h1>
       </div>
-      <div className='p-2 py-3 flex flex-col gap-2 h-[430px] overflow-y-auto'>
+      <div className='p-2 py-3 flex flex-col gap-2 h-[495px] md:h-[425px] overflow-y-auto'>
         {activities.map((activity, index) => (
           <div
             key={index}

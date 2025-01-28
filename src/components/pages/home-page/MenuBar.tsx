@@ -41,7 +41,10 @@ const MenuBar: FC<MenuBarProps> = ({ activeMenu, handleMenuClick }) => {
   }, [activeMenu]);
 
   return (
-    <div ref={menuBarRef} className='w-full relative flex items-center gap-10'>
+    <div
+      ref={menuBarRef}
+      className='w-full relative hidden lg:flex items-center gap-10'
+    >
       {MenuItems.map((item) => {
         return (
           <div
@@ -53,14 +56,7 @@ const MenuBar: FC<MenuBarProps> = ({ activeMenu, handleMenuClick }) => {
             key={item.id}
             data-title={item.title}
           >
-            <img
-              style={{
-                filter: '',
-              }}
-              className='w-[12px] h-[12px]'
-              src={item.icon}
-              alt='img'
-            />
+            <img className='w-[12px] h-[12px]' src={item.icon} alt='img' />
             <p
               className={cn(
                 activeMenu === item.title && 'font-semibold text-black'

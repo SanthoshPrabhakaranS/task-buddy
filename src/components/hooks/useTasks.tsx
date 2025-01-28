@@ -1,9 +1,8 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Activity, Task } from '../../utils/types';
 import { db } from '../../firebase/firebase';
 import {
   addDoc,
-  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -11,18 +10,19 @@ import {
   query,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { cloudinaryConfig } from '../config/CloudinaryConfig';
 import { toast } from 'sonner';
 import { useGlobalContext } from '../../context/GlobalContext';
-import useGetUser from './useGetUser';
 import { v4 as uuidv4 } from 'uuid';
+import { Storage } from '../storage/storage';
 
 const useTasks = () => {
   const { tasks, setTasks } = useGlobalContext();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useGetUser();
+  const userId = new Storage().getItem('userId');
 
   const generateId = useCallback(() => {
     return uuidv4().slice(0, 8);
@@ -33,13 +33,13 @@ const useTasks = () => {
     setLoading(true);
 
     try {
-      if (!user?.uid) {
+      if (!userId) {
         console.log('User is not authenticated');
         setError('User is not authenticated');
       }
 
       const querySnapshot = await getDocs(
-        query(collection(db, 'tasks'), where('userId', '==', user.uid))
+        query(collection(db, 'tasks'), where('userId', '==', userId))
       );
       const tasks = querySnapshot.docs.map((doc) => {
         return {
@@ -53,13 +53,14 @@ const useTasks = () => {
           activity: doc.data().activity,
         } as Task;
       });
+
       setTasks([...tasks]);
     } catch (error) {
       setError('Failed to fetch tasks');
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError, setTasks, user?.uid]);
+  }, [setLoading, setError, setTasks, userId]);
 
   const uploadAttachmentInCloud = useCallback(
     async (task: Task, fileURL: string | null) => {
@@ -96,8 +97,9 @@ const useTasks = () => {
     async (task: Task) => {
       try {
         let fileURL = null;
+        let activities: Activity[] = [];
 
-        if (user?.uid === undefined) {
+        if (userId === undefined) {
           console.log('User is not authenticated');
           setError('User is not authenticated');
         }
@@ -107,16 +109,16 @@ const useTasks = () => {
           task = updatedTask;
         }
 
-        const activity = {
+        activities.push({
           id: generateId(),
           updatedAt: new Date().toISOString(),
           action: 'You created this task',
-        };
+        });
 
         const docRef = await addDoc(collection(db, 'tasks'), {
           ...task,
-          userId: user?.uid,
-          activity: [activity],
+          userId: userId,
+          activity: activities,
         });
         setError(null);
         await fetchTasks();
@@ -126,7 +128,7 @@ const useTasks = () => {
         setError('Failed to create task');
       }
     },
-    [setError, fetchTasks, uploadAttachmentInCloud, user?.uid]
+    [setError, fetchTasks, uploadAttachmentInCloud, userId]
   );
 
   //Edit Task
@@ -135,6 +137,8 @@ const useTasks = () => {
       try {
         let fileURL = null;
         let activityUpdates: Activity[] = [];
+        console.log(tasks);
+
         const unUpdatedTask = tasks.find((temp) => temp.id == task.id);
 
         if (task.attachment && unUpdatedTask?.attachment != task.attachment) {
@@ -148,7 +152,7 @@ const useTasks = () => {
           });
         }
 
-        if (unUpdatedTask?.status !== task.status) {
+        if (unUpdatedTask?.status && unUpdatedTask?.status !== task.status) {
           activityUpdates.push({
             id: generateId(),
             action: `You changed the status from ${
@@ -158,7 +162,10 @@ const useTasks = () => {
           });
         }
 
-        if (unUpdatedTask?.category !== task.category) {
+        if (
+          unUpdatedTask?.category &&
+          unUpdatedTask?.category !== task.category
+        ) {
           activityUpdates.push({
             id: generateId(),
             action: `You changed the category from ${unUpdatedTask?.category} to ${task.category}`,
@@ -166,7 +173,10 @@ const useTasks = () => {
           });
         }
 
-        if (unUpdatedTask?.description !== task.description) {
+        if (
+          unUpdatedTask?.description &&
+          unUpdatedTask?.description !== task.description
+        ) {
           activityUpdates.push({
             id: generateId(),
             action: `You updated the description`,
@@ -174,7 +184,7 @@ const useTasks = () => {
           });
         }
 
-        if (unUpdatedTask?.title !== task.title) {
+        if (unUpdatedTask?.title && unUpdatedTask?.title !== task.title) {
           activityUpdates.push({
             id: generateId(),
             action: `You updated the title`,
@@ -191,7 +201,7 @@ const useTasks = () => {
           category: task.category,
           description: task.description ?? '',
           attachment: task.attachment ?? '',
-          activity: [...(task.activity || []), ...activityUpdates],
+          activity: [...(unUpdatedTask?.activity || []), ...activityUpdates],
         });
 
         setError(null);
@@ -202,7 +212,23 @@ const useTasks = () => {
         setError('Failed to edit task');
       }
     },
-    [fetchTasks, setError, uploadAttachmentInCloud, user?.uid]
+    [
+      fetchTasks,
+      setError,
+      uploadAttachmentInCloud,
+      userId,
+      tasks,
+      generateId,
+      updateDoc,
+      db,
+      doc,
+      addDoc,
+      collection,
+      where,
+      query,
+      getDocs,
+      deleteDoc,
+    ]
   );
 
   // Delete task
@@ -231,6 +257,8 @@ const useTasks = () => {
         }
 
         let queryRef = query(collection(db, 'tasks'));
+
+        queryRef = query(queryRef, where('userId', '==', userId));
 
         // Apply category filter
         if (categoryValue && categoryValue !== 'ALL') {
@@ -268,7 +296,11 @@ const useTasks = () => {
   const filterBySearch = useCallback(
     async (searchValue: string) => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'tasks'));
+        let queryRef = query(collection(db, 'tasks'));
+
+        queryRef = query(queryRef, where('userId', '==', userId));
+
+        const querySnapshot = await getDocs(queryRef);
 
         const allTasks = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -300,6 +332,64 @@ const useTasks = () => {
     [setTasks, setError]
   );
 
+  // Bulk status update
+  const bulkStatusUpdate = useCallback(
+    async (taskIds: string[], newStatus: string) => {
+      try {
+        const batch = writeBatch(db);
+
+        taskIds.forEach((taskId) => {
+          const taskRef = doc(db, 'tasks', taskId);
+
+          const updateData = {
+            status: newStatus,
+            activity: [
+              {
+                id: generateId(),
+                updatedAt: new Date().toISOString(),
+                action: `You changed the status to ${newStatus}`,
+              },
+            ],
+          };
+
+          batch.update(taskRef, updateData);
+        });
+        await batch.commit();
+        await fetchTasks();
+        toast.success('Tasks status updated successfully!');
+      } catch (error) {
+        console.log('Error', error);
+        setError('Failed to update task status');
+      }
+    },
+    [setError, fetchTasks, generateId, setTasks, updateDoc, writeBatch, doc, db]
+  );
+
+  // Bulk delete tasks
+  const bulkDeleteTasks = useCallback(
+    async (taskIds: string[]) => {
+      try {
+        const batch = writeBatch(db);
+
+        taskIds.forEach((taskId) => {
+          const taskRef = doc(db, 'tasks', taskId);
+          batch.delete(taskRef);
+        });
+
+        await batch.commit();
+        await fetchTasks();
+        toast.success('Tasks deleted successfully!');
+      } catch (error) {
+        setError('Failed to delete tasks');
+      }
+    },
+    [setError, fetchTasks, writeBatch, doc, db]
+  );
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   return {
     tasks,
     loading,
@@ -311,6 +401,8 @@ const useTasks = () => {
     deleteTask,
     handleFilterByCategoryAndDate,
     filterBySearch,
+    bulkStatusUpdate,
+    bulkDeleteTasks,
   };
 };
 

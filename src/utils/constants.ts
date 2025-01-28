@@ -57,3 +57,14 @@ export const TASK_ACTIONS = [
     icon: assets.DeleteImg,
   },
 ];
+
+export const MODAL_TOGGLE_BUTTON_VALUES = [
+  {
+    id: 1,
+    title: 'Details',
+  },
+  {
+    id: 2,
+    title: 'Activity',
+  },
+];

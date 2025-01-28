@@ -3,9 +3,13 @@ import UserProfile from './UserProfile';
 
 const Navbar = () => {
   return (
-    <div className='w-full flex justify-between items-center'>
+    <div className='w-full max-lg:h-[54px] max-lg:px-4 lg:p-[2rem] max-lg:bg-lighPink flex justify-between items-center sticky top-0'>
       <div className='w-full'>
-        <img className='w-[130px] h-[30px]' src={assets.LogoBlack} alt='logo' />
+        <img
+          className='w-[110px] h-[110px] lg:w-[130px] lg:h-[30px]'
+          src={assets.LogoBlack}
+          alt='logo'
+        />
       </div>
 
       <UserProfile />
